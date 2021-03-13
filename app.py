@@ -1,4 +1,4 @@
-from sfms import app
+import sfms
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    sfms.app.run(debug=True)

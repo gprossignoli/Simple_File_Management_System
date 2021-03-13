@@ -1,18 +1,23 @@
-from flask import Flask, render_template
-from flask_bcrypt import Bcrypt
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_user import UserManager
 
 from sfms import settings as st
 
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = st.SECRET_KEY
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite//:{st.DB_NAME}.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{st.DB_NAME}.db'
 app.config['CSRF_ENABLED'] = st.CSRF
+app.config['USER_APP_NAME'] = st.USER_APP_NAME
+app.config['USER_ENABLE_EMAIL'] = st.USER_ENABLE_EMAIL
+app.config['USER_ENABLE_USERNAME'] = st.USER_ENABLE_USERNAME
 db = SQLAlchemy(app)
-bcrypt = Bcrypt(app)
+from sfms.main.routes import main
+from sfms.files.routes import files
+app.register_blueprint(blueprint=main)
+app.register_blueprint(blueprint=files)
 
-
-@app.route("/home", methods=['GET'])
-def home():
-    return render_template('home.html')
-
+from sfms.users.models import User
+UserManager(app, db, User)
+db.create_all()
