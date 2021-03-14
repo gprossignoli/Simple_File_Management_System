@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="row">
-    <div class="col-md-6">
+    <div id="file_list" class="col-md-6">
         <h1>Your files:</h1>
         <ul>
             {% for file in files %}
@@ -15,7 +15,8 @@
         </ul>
       </div>
       <div class="col-md-6">
-        <form method="POST" action="">
+        <form method="POST" enctype="multipart/form-data" action="">
+            {{ form.csrf_token }}
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4">{{ legend }}</legend>
