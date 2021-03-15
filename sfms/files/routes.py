@@ -36,3 +36,13 @@ def delete_file(filename):
         return f'File: {e.filename} does not exists!', 404
     FileService.delete_file(file)
     return redirect('/files')
+
+
+@files.route('/download/<string:filename>', methods=['POST'])
+@login_required
+def download_file(filename):
+    try:
+        file = FileService.get_file_from_disk(filename)
+    except FileNotExistsError as e:
+        return f'File: {e.filename} does not exists!', 404
+    return file

@@ -3,6 +3,7 @@ from collections import namedtuple
 from hashlib import sha256
 from os import stat
 
+from flask import send_from_directory
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 
@@ -106,5 +107,10 @@ class FileService:
         file.save(path)
         return path
 
+    @classmethod
+    def get_file_from_disk(cls, filename):
+        if not os.path.exists(os.path.join(st.FILES_DIR, filename)):
+            raise FileNotExistsError
+        return send_from_directory(directory=st.FILES_DIR, filename=filename)
 
 
