@@ -10,6 +10,11 @@
                 <p>creation date: {{ file.creation_date }}</p>
                 <p>Size: {{ file.size }}</p>
                 <p>Hash: {{ file.hash }}</p>
+                 <div>
+                    <form action="{{ url_for('files.delete_file', filename=file.title) }}" method="POST">
+                        <input class="btn btn-danger" type="submit" value="Delete">
+                    </form>
+                 </div>
             </li>
             {% endfor %}
         </ul>

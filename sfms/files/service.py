@@ -31,6 +31,12 @@ class FileInsertionError(Exception):
         super().__init__()
 
 
+class FileDeletionError(Exception):
+    def __init__(self, filename: str):
+        self.filename = filename
+        super().__init__()
+
+
 class FileService:
     @staticmethod
     def get_user_files(user_id: int) -> tuple[Files, ...]:
@@ -72,6 +78,17 @@ class FileService:
             db.session.commit()
 
     @classmethod
+    def delete_file(cls, file: File):
+        try:
+            db.session.delete(file)
+        except Exception as e:
+            st.logger.exception(e)
+            raise FileDeletionError(file.title)
+        else:
+            os.remove(os.path.join(st.FILES_DIR, file.title))
+        db.session.commit()
+
+    @classmethod
     def get_file_by_title(cls, filename: str) -> File:
         file = db.session.query(File).filter_by(title=filename).first()
         if file is None:
@@ -88,5 +105,6 @@ class FileService:
         path = os.path.join(st.FILES_DIR, filename)
         file.save(path)
         return path
+
 
 

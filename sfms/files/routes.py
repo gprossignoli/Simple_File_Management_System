@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template
 from flask_user import current_user, login_required
+from werkzeug.utils import redirect
 
 from sfms.files.service import FileService, FileAlreadyExistsError, FileNotExistsError, FileInsertionError
 from sfms.files.forms import FileForm
@@ -25,3 +26,13 @@ def files_view():
 
     return render_template(template_name_or_list='files.html', files=files_data, form=form)
 
+
+@files.route('/delete/<string:filename>', methods=['POST', 'DELETE'])
+@login_required
+def delete_file(filename):
+    try:
+        file = FileService.get_file_by_title(filename)
+    except FileNotExistsError as e:
+        return f'File: {e.filename} does not exists!', 404
+    FileService.delete_file(file)
+    return redirect('/files')
