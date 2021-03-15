@@ -13,7 +13,19 @@ from sfms import settings as st
 Files = namedtuple('Files', ['title', 'creation_date', 'size', 'hash'])
 
 
-class FileAlreadyExistsException(Exception):
+class FileAlreadyExistsError(Exception):
+    def __init__(self, filename: str):
+        self.filename = filename
+        super().__init__()
+
+
+class FileNotExistsError(Exception):
+    def __init__(self, filename: str):
+        self.filename = filename
+        super().__init__()
+
+
+class FileInsertionError(Exception):
     def __init__(self, filename: str):
         self.filename = filename
         super().__init__()
@@ -45,23 +57,36 @@ class FileService:
     def create_file(cls, uploaded_file: FileStorage, user_id: int):
         filename = secure_filename(uploaded_file.filename)
         if db.session.query(File).filter_by(title=filename).first() is not None:
-            raise FileAlreadyExistsException(filename)
+            raise FileAlreadyExistsError(filename)
+        blob = uploaded_file.read()
+        size = len(blob)
+        f_hash = sha256(blob).hexdigest()
+        # A way of transactional insert
+        try:
+            cls.__save_file_db(f_hash, filename, size, user_id)
+        except Exception as e:
+            st.logger.exception(e)
+            raise FileInsertionError(filename)
+        else:
+            cls.__save_file_disk(uploaded_file, filename)
+            db.session.commit()
 
-        path = cls.__save_file_disk(uploaded_file, filename)
-        with open(path, 'rb') as f:
-            file = f.read()
-        size = len(file)
-        f_hash = sha256(file).hexdigest()
-        cls.__save_file_db(f_hash, filename, size, user_id)
+    @classmethod
+    def get_file_by_title(cls, filename: str) -> File:
+        file = db.session.query(File).filter_by(title=filename).first()
+        if file is None:
+            raise FileNotExistsError(filename)
+        return file
 
     @classmethod
     def __save_file_db(cls, f_hash: str, filename: str, size: int, user_id: int):
         file = File(title=filename, file_size=size, file_hash=f_hash, owner_id=user_id)
         db.session.add(file)
-        db.session.commit()
 
     @classmethod
     def __save_file_disk(cls, file: FileStorage, filename: str):
         path = os.path.join(st.FILES_DIR, filename)
         file.save(path)
         return path
+
+

@@ -12,6 +12,7 @@ app.config['CSRF_ENABLED'] = st.CSRF
 app.config['USER_APP_NAME'] = st.USER_APP_NAME
 app.config['USER_ENABLE_EMAIL'] = st.USER_ENABLE_EMAIL
 app.config['USER_ENABLE_USERNAME'] = st.USER_ENABLE_USERNAME
+app.config['USER_CORPORATION_NAME'] = st.USER_CORPORATION_NAME
 
 db = SQLAlchemy(app)
 from sfms.main.routes import main
