@@ -45,3 +45,5 @@ logger.addHandler(debug_logger)
 logger.addHandler(info_logger)
 logger.addHandler(error_logger)
 
+
+FILES_PER_PAGE = 8

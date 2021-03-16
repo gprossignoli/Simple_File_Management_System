@@ -1,11 +1,11 @@
 import os
 from collections import namedtuple
 from hashlib import sha256
-from os import stat
 
 from flask import send_from_directory
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
+from werkzeug.exceptions import NotFound
 
 from sfms import db
 from sfms.files.models import File
@@ -40,7 +40,7 @@ class FileDeletionError(Exception):
 
 class FileService:
     @staticmethod
-    def get_user_files(user_id: int) -> tuple[Files, ...]:
+    def get_user_files(user_id: int, current_page: int) -> tuple[tuple[Files, ...], int, int]:
         def show_file_size(size_in_bytes):
             to_MB = 1 * (10 ** -6)
             to_KB = 1 * (10 ** -3)
@@ -53,12 +53,28 @@ class FileService:
                     size = size_in_bytes
                     unit = " B"
             return str(size) + unit
-        query_rst = db.session.query(File).filter_by(owner_id=user_id).all()
+
+        def get_next_and_prev_page():
+            if not query_rst.has_prev:
+                prev = current_page
+            else:
+                prev = current_page - 1
+            if not query_rst.has_next:
+                next_p = current_page
+            else:
+                next_p = current_page + 1
+            return next_p, prev
+
+        query_rst = db.session.query(File).filter_by(owner_id=user_id).order_by(
+            File.title.asc()
+        ).paginate(current_page, per_page=st.FILES_PER_PAGE)
 
         files = [Files(title=file.title, creation_date=file.time_created,
-                       size=show_file_size(file.file_size), hash=file.file_hash) for file in query_rst]
-        files.sort(key=lambda x: x.title)
-        return tuple(files)
+                       size=show_file_size(file.file_size), hash=file.file_hash) for file in query_rst.items]
+
+        next_page, prev_page = get_next_and_prev_page()
+
+        return tuple(files), prev_page, next_page 
 
     @classmethod
     def create_file(cls, uploaded_file: FileStorage, user_id: int):

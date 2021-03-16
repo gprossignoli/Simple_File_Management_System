@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 from flask_user import current_user, login_required
 from werkzeug.utils import redirect
 
@@ -21,10 +21,23 @@ def files_view():
             return f'File: {e.filename} already exists!', 400
         except FileInsertionError as e:
             return f'File: {e.filename} insertion failed!', 500
+    page = request.args.get('page', 1)
+    try:
+        if page == "":
+            page = 1
+        page = int(page)
+        if page < 1:
+            page = 1
 
-    files_data = FileService.get_user_files(current_user.id)
+    except TypeError:
+        return f'Page parameter not valid, must be integer', 400
 
-    return render_template(template_name_or_list='files.html', files=files_data, form=form)
+    files_data, prev_page, next_page = FileService.get_user_files(user_id=current_user.id, current_page=page)
+
+
+
+    return render_template(template_name_or_list='files.html', files=files_data, form=form,
+                           next_page=next_page, prev_page=prev_page)
 
 
 @files.route('/delete/<string:filename>', methods=['POST', 'DELETE'])
