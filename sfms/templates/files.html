@@ -6,6 +6,7 @@
         <ul>
             {% for file in files %}
             <li>
+                <p>{{ "Owner: {}".format(file.owner) if file.owner }}</p>
                 <p>Title: {{ file.title }}</p>
                 <p>creation date: {{ file.creation_date }}</p>
                 <p>Size: {{ file.size }}</p>

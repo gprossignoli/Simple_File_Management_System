@@ -28,13 +28,13 @@ def files_view():
         page = int(page)
         if page < 1:
             page = 1
-
     except TypeError:
         return f'Page parameter not valid, must be integer', 400
+    if 'admin' in [role.name for role in current_user.roles]:
+        files_data, prev_page, next_page = FileService.get_all_files(current_page=page)
 
-    files_data, prev_page, next_page = FileService.get_user_files(user_id=current_user.id, current_page=page)
-
-
+    else:
+        files_data, prev_page, next_page = FileService.get_user_files(user_id=current_user.id, current_page=page)
 
     return render_template(template_name_or_list='files.html', files=files_data, form=form,
                            next_page=next_page, prev_page=prev_page)

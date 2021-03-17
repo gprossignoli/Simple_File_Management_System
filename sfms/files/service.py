@@ -5,13 +5,14 @@ from hashlib import sha256
 from flask import send_from_directory
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
-from werkzeug.exceptions import NotFound
 
 from sfms import db
 from sfms.files.models import File
+from sfms.users.models import User
 from sfms import settings as st
 
 Files = namedtuple('Files', ['title', 'creation_date', 'size', 'hash'])
+Files_admin = namedtuple('Files_admin', ['owner', 'title', 'creation_date', 'size', 'hash'])
 
 
 class FileAlreadyExistsError(Exception):
@@ -39,42 +40,35 @@ class FileDeletionError(Exception):
 
 
 class FileService:
-    @staticmethod
-    def get_user_files(user_id: int, current_page: int) -> tuple[tuple[Files, ...], int, int]:
-        def show_file_size(size_in_bytes):
-            to_MB = 1 * (10 ** -6)
-            to_KB = 1 * (10 ** -3)
-            size = round(size_in_bytes*to_MB, 3)
-            unit = " MB"
-            if size < 1:
-                size = round(size_in_bytes*to_KB, 3)
-                unit = " KB"
-                if size < 1:
-                    size = size_in_bytes
-                    unit = " B"
-            return str(size) + unit
+    @classmethod
+    def get_all_files(cls, current_page: int) -> tuple[tuple[Files_admin, ...], int, int]:
+        query_rst = db.session.query(File).order_by(
+            File.title.asc()
+        ).paginate(current_page, per_page=st.FILES_PER_PAGE)
 
-        def get_next_and_prev_page():
-            if not query_rst.has_prev:
-                prev = current_page
-            else:
-                prev = current_page - 1
-            if not query_rst.has_next:
-                next_p = current_page
-            else:
-                next_p = current_page + 1
-            return next_p, prev
+        files = [Files_admin(owner=db.session.query(User).get(file.owner_id).username, title=file.title, creation_date=file.time_created,
+                             size=cls.__show_file_size(file.file_size), hash=file.file_hash) for file in query_rst.items]
 
+        next_page, prev_page = cls.__get_next_and_prev_page(has_prev=query_rst.has_prev,
+                                                            has_next=query_rst.has_next,
+                                                            current_page=current_page)
+
+        return tuple(files), prev_page, next_page
+
+    @classmethod
+    def get_user_files(cls, user_id: int, current_page: int) -> tuple[tuple[Files, ...], int, int]:
         query_rst = db.session.query(File).filter_by(owner_id=user_id).order_by(
             File.title.asc()
         ).paginate(current_page, per_page=st.FILES_PER_PAGE)
 
         files = [Files(title=file.title, creation_date=file.time_created,
-                       size=show_file_size(file.file_size), hash=file.file_hash) for file in query_rst.items]
+                       size=cls.__show_file_size(file.file_size), hash=file.file_hash) for file in query_rst.items]
 
-        next_page, prev_page = get_next_and_prev_page()
+        next_page, prev_page = cls.__get_next_and_prev_page(has_prev=query_rst.has_prev,
+                                                            has_next=query_rst.has_next,
+                                                            current_page=current_page)
 
-        return tuple(files), prev_page, next_page 
+        return tuple(files), prev_page, next_page
 
     @classmethod
     def create_file(cls, uploaded_file: FileStorage, user_id: int):
@@ -129,4 +123,29 @@ class FileService:
             raise FileNotExistsError
         return send_from_directory(directory=st.FILES_DIR, filename=filename)
 
+    @staticmethod
+    def __show_file_size(size_in_bytes: int):
+        to_MB = 1 * (10 ** -6)
+        to_KB = 1 * (10 ** -3)
+        size = round(size_in_bytes * to_MB, 3)
+        unit = " MB"
+        if size < 1:
+            size = round(size_in_bytes * to_KB, 3)
+            unit = " KB"
+            if size < 1:
+                size = size_in_bytes
+                unit = " B"
+        return str(size) + unit
+
+    @staticmethod
+    def __get_next_and_prev_page(has_prev: bool, has_next: bool, current_page: int) -> tuple[int,int]:
+        if not has_prev:
+            prev = current_page
+        else:
+            prev = current_page - 1
+        if not has_next:
+            next_p = current_page
+        else:
+            next_p = current_page + 1
+        return next_p, prev
 
