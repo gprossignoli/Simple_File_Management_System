@@ -55,6 +55,7 @@ def delete_file(filename):
 @login_required
 def download_file(filename):
     try:
+        filename = f'{current_user.id}_{filename}'
         file = FileService.get_file_from_disk(filename)
     except FileNotExistsError as e:
         return f'File: {e.filename} does not exists!', 404

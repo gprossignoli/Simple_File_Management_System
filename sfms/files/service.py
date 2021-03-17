@@ -61,7 +61,7 @@ class FileService:
             File.title.asc()
         ).paginate(current_page, per_page=st.FILES_PER_PAGE)
 
-        files = [Files(title=file.title, creation_date=file.time_created,
+        files = [Files(title=file.title[2:], creation_date=file.time_created,
                        size=cls.__show_file_size(file.file_size), hash=file.file_hash) for file in query_rst.items]
 
         next_page, prev_page = cls.__get_next_and_prev_page(has_prev=query_rst.has_prev,
@@ -72,8 +72,8 @@ class FileService:
 
     @classmethod
     def create_file(cls, uploaded_file: FileStorage, user_id: int):
-        filename = secure_filename(uploaded_file.filename)
-        if db.session.query(File).filter_by(title=filename).first() is not None:
+        filename = secure_filename(f'{user_id}_{uploaded_file.filename}')
+        if db.session.query(File).filter_by(owner_id=user_id, title=filename).first() is not None:
             raise FileAlreadyExistsError(filename)
         blob = uploaded_file.read()
         size = len(blob)
