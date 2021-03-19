@@ -5,8 +5,12 @@ Utiliza Flask-user y Flask-SQLAlchemy (sqlite) para la gestión de los usuarios 
 
 Para instalar la aplicación se deben seguir estos pasos:
 1. Descargar el código del repositorio.
-2. Modificar el fichero settings.ini, poniendo la flask-key (Debe permanecer en secreto), y las rutas a la DB de sqlite(incluido el nombre de ésta) y la ruta a la carpeta dónde se alojarán los ficheros subidos por los usuarios.
-3. El usuario administrador es opcional, si se desea crear hay que ejecutar el script create_admin.py (python create_admin.py).
+2. Instalar las dependencias del proyecto, para ello:
+  - Recomiendo utilizar un entorno virtual, yo uso pyenv. [Introducción a pyenv](https://realpython.com/intro-to-pyenv/)
+  - Para generar el entorno virtual: pyenv virtualenv <versión_python> <nombre_entorno>. Para el desarrollo se ha usado python 3.9.0
+  - Una vez generado el entorno, en la carpeta del proyecto, ejecutar: pip install -r requirements.txt
+3. Modificar el fichero settings.ini, poniendo la flask-key (Debe permanecer en secreto), y las rutas a la DB de sqlite(incluido el nombre de ésta) y a la carpeta dónde se alojarán los ficheros subidos por los usuarios.
+4. El usuario administrador es opcional, si se desea crear hay que ejecutar el script create_admin.py (python create_admin.py).
 
 Una vez instalado, se ejecuta el script app.py y listo.
 
