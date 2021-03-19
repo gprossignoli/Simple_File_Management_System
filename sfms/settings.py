@@ -9,7 +9,7 @@ config = configparser.ConfigParser()
 config.read(os.path.join(ROOT_DIR, "settings.ini"))
 
 SECRET_KEY = config.get('SECRETS', 'flask_key')
-DB_NAME = config.get('DB', 'sqlite')
+DB_PATH = config.get('DB', 'sqlite')
 FILES_DIR = config.get('SECRETS', 'files_dir')
 CSRF = True
 
@@ -18,6 +18,7 @@ USER_APP_NAME = "Simple File Management System"  # Shown in and email templates 
 USER_ENABLE_EMAIL = False
 USER_ENABLE_USERNAME = True
 USER_CORPORATION_NAME = "Gerardo"
+USER_COPYRIGHT_YEAR = 2021
 
 # LOGGING CONFIG
 

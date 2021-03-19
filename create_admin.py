@@ -1,6 +1,5 @@
-from passlib.hash import  bcrypt
+from passlib.hash import bcrypt
 from sqlalchemy.exc import IntegrityError
-from werkzeug.security import generate_password_hash
 
 from sfms.users.models import User, Role
 from sfms import db
@@ -16,7 +15,7 @@ while password != rep_password:
     print(f'Repeat the password please: ')
     rep_password = str(input())
 
-
+# Flask user password validation expects bcrypt type hash
 hash_pass = bcrypt.hash(password)
 admin_role = db.session.query(Role).filter_by(name='admin').first()
 if not admin_role:

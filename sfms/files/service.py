@@ -76,6 +76,9 @@ class FileService:
         if db.session.query(File).filter_by(owner_id=user_id, title=filename).first() is not None:
             raise FileAlreadyExistsError(filename)
         blob = uploaded_file.read()
+        # FileStorage class (which is the class to handle uploaded file in Flask)
+        # points to end of file after every action (saving or reading).
+        uploaded_file.stream.seek(0)
         size = len(blob)
         f_hash = sha256(blob).hexdigest()
         # A way of transactional insert
@@ -121,7 +124,7 @@ class FileService:
     def get_file_from_disk(cls, filename):
         if not os.path.exists(os.path.join(st.FILES_DIR, filename)):
             raise FileNotExistsError
-        return send_from_directory(directory=st.FILES_DIR, filename=filename)
+        return send_from_directory(directory=st.FILES_DIR, filename=filename, as_attachment=True)
 
     @staticmethod
     def __show_file_size(size_in_bytes: int):

@@ -44,6 +44,8 @@ def files_view():
 @login_required
 def delete_file(filename):
     try:
+        if 'admin' not in [role.name for role in current_user.roles]:
+            filename = f'{current_user.id}_{filename}'
         file = FileService.get_file_by_title(filename)
     except FileNotExistsError as e:
         return f'File: {e.filename} does not exists!', 404
@@ -55,7 +57,8 @@ def delete_file(filename):
 @login_required
 def download_file(filename):
     try:
-        filename = f'{current_user.id}_{filename}'
+        if 'admin' not in [role.name for role in current_user.roles]:
+            filename = f'{current_user.id}_{filename}'
         file = FileService.get_file_from_disk(filename)
     except FileNotExistsError as e:
         return f'File: {e.filename} does not exists!', 404
