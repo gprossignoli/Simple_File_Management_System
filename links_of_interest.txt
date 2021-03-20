@@ -1,0 +1,6 @@
+Some links with docs and tutorials that I've used for this development.
+- [Flask-User documentation](https://flask-user.readthedocs.io/en/latest/)
+- [Flask-SQLAlchemy documentation](https://flask-sqlalchemy.palletsprojects.com/en/2.x/)
+- [Really useful blog with docker and python's performance articles](https://pythonspeed.com/)
+- [Bootstrap documentation](https://getbootstrap.com/)
+- [One of the best python channel in youtube](https://www.youtube.com/user/schafer5)
