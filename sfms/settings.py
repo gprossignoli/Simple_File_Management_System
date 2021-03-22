@@ -12,6 +12,7 @@ SECRET_KEY = config.get('SECRETS', 'flask_key')
 DB_PATH = config.get('DB', 'sqlite')
 FILES_DIR = config.get('SECRETS', 'files_dir')
 CSRF = True
+FILES_PER_PAGE = 8
 
 # Flask user config
 USER_APP_NAME = "Simple File Management System"  # Shown in and email templates and page footers
@@ -45,6 +46,3 @@ error_logger.setFormatter(formatter)
 logger.addHandler(debug_logger)
 logger.addHandler(info_logger)
 logger.addHandler(error_logger)
-
-
-FILES_PER_PAGE = 8

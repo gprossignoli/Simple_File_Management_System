@@ -4,11 +4,10 @@ COPY requirements.txt /tmp/
 RUN pip install -r /tmp/requirements.txt
 
 WORKDIR /sfms
-RUN ls -l
+
+EXPOSE 8001
 
 COPY . .
 RUN chmod 744 .
 
-EXPOSE 8001
-
-CMD ["python", app.py]
+CMD ["python", "app.py"]
