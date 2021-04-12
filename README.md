@@ -9,7 +9,10 @@ Para instalar la aplicación se deben seguir estos pasos:
   - Recomiendo utilizar un entorno virtual, yo uso pyenv. [Introducción a pyenv](https://realpython.com/intro-to-pyenv/)
   - Para generar el entorno virtual: pyenv virtualenv <versión_python> <nombre_entorno>. Para el desarrollo se ha usado python 3.9.0
   - Una vez generado el entorno, en la carpeta del proyecto, ejecutar: pip install -r requirements.txt
-3. Modificar el fichero settings.ini, poniendo la flask-key **(Debe permanecer en secreto)**, y las rutas a la DB de sqlite(incluido el nombre de ésta) y a la carpeta dónde se alojarán los ficheros subidos por los usuarios.
+3. Modificar el fichero settings.ini:
+  - Poniendo la flask-key **(Debe permanecer en secreto)**
+  - En el campo sqlite, se puede introducir una ruta válida a un fichero ya existente (Si se va a lanzar en docker, colocar este fichero dentro de la carpeta del proyecto), o poner una ruta válida para un nuevo fichero, que será creado automaticamente, o no poner nada, en cuyo caso se creará sfms.db en la ruta ROOT_DEL_PROYECTO/sfms/ 
+  - En el campo files_dir, se puede introducir una ruta válida a un directorio ya existente (Si se va a lanzar en docker, colocar este directorio dentro de la carpeta del proyecto), o poner una ruta válida para un nuevo directorio, que será creado automaticamente, o no poner nada, en cuyo caso se creará /files_storage en la ruta ROOT_DEL_PROYECTO/ 
 4. El usuario administrador es opcional, si se desea crear hay que ejecutar el script create_admin.py (python create_admin.py).
 
 Una vez instalado, se ejecuta el script app.py y listo.
@@ -47,7 +50,10 @@ To install the app, follow the next steps:
   - I highly recommend to use a virtual environment, I usually use pyenv. [Pyenv introduction.](https://realpython.com/intro-to-pyenv/)
   - To generate the environment: pyenv virtualenv <versión_python> <nombre_entorno>. For this development, I've used python 3.9.0.
   - Once the environment has been generated, inside the project's folder, execute: pip install -r requirements.txt
-3. Modify the settings.ini file, setting the flask key **(keep this key in secret!)**, the sqlite's DB path (including its name), and the path to the folder where files will be storage.
+3. Modify the settings.ini file:
+  - Set flask-key field **(keep this key in secret!)**
+  - Set the sqlite field, you can introduce a valid path to an already existent file (If docker is used, put that file inside the projects path), or set a valid path for a new file that will be automaticly created, or leave it blank, in which it will be created a file named sfms.db in the path PROJECT_ROOT/sfms/
+  - Set the files_dir field, you can introduce a valid path to an already existent directory (If docker is used, put that directory inside the projects path), or set a valid path for a new directory that will be automaticly created, or leave it blank, in which it will be created a directory /files_storage in the path PROJECT_ROOT/ 
 4. Admin user is optional, if you want to have one, execute the script named create_admin.py (python create_admin.py).
 
 When the app is already installed, execute the app.py script and ready!
