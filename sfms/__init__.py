@@ -8,7 +8,7 @@ from sfms import settings as st
 app = Flask(__name__)
 app.config['SECRET_KEY'] = st.SECRET_KEY
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+'{}.db'.format(st.DB_PATH)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+'{}'.format(st.DB_PATH)
 app.config['CSRF_ENABLED'] = st.CSRF
 app.config['USER_APP_NAME'] = st.USER_APP_NAME
 app.config['USER_ENABLE_EMAIL'] = st.USER_ENABLE_EMAIL

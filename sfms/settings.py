@@ -3,14 +3,48 @@ import os
 import configparser
 from logging.handlers import RotatingFileHandler
 
+
 ROOT_DIR = os.path.dirname(os.path.abspath("settings.py"))
 settings_file = open(os.path.join(ROOT_DIR, "settings.ini"), "r")
 config = configparser.ConfigParser()
 config.read(os.path.join(ROOT_DIR, "settings.ini"))
 
+
+def __get_db_path() -> str:
+    path = config.get('DB', 'sqlite')
+    if path == '':
+        path = 'sfms.db'
+    elif '.db' not in path:
+        path = path + '.db'
+    return path
+
+
+def __get_files_dir() -> str:
+    path = config.get('SECRETS', 'files_dir')
+    dir_not_exists = False
+    if path == '':
+        path = os.path.join(ROOT_DIR, "files_storage")
+        dir_not_exists = True
+    elif not os.path.exists(path):
+        dir_not_exists = True
+
+    elif not os.path.isdir(path):
+        raise Exception("Files storage path provided is not a directory, check settings.ini")
+
+    if dir_not_exists:
+        try:
+            os.mkdir(path)
+        except FileExistsError:
+            pass
+
+    return path
+
+
 SECRET_KEY = config.get('SECRETS', 'flask_key')
-DB_PATH = config.get('DB', 'sqlite')
-FILES_DIR = config.get('SECRETS', 'files_dir')
+DB_PATH = __get_db_path()
+
+FILES_DIR = __get_files_dir()
+
 CSRF = True
 FILES_PER_PAGE = 8
 
